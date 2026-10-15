@@ -1,3 +1,5 @@
+import {previewTarget} from './game.js';
+import {reelSymbols} from './slots.js';
 export function createRenderer(canvas,skin){
  const c=canvas.getContext('2d');let width=0,height=0,scale=1,ox=0,oy=0;const particles=[];
  function resize(){const r=canvas.getBoundingClientRect();width=r.width;height=r.height;const dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);c.setTransform(dpr,0,0,dpr,0,0);scale=Math.min(width,height)/1000;ox=(width-1000*scale)/2;oy=(height-1000*scale)/2;}
@@ -13,12 +15,13 @@ export function createRenderer(canvas,skin){
  c.lineCap='round';c.lineJoin='round';c.beginPath();g.path.points.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.strokeStyle=skin.trackEdge;c.lineWidth=g.level.ballRadius*2+10;c.stroke();c.strokeStyle=skin.track;c.lineWidth=g.level.ballRadius*2+4;c.stroke();
  const end=g.path.at(g.path.length);c.beginPath();c.arc(end.x,end.y,25,0,Math.PI*2);c.fillStyle='#0a1118';c.fill();c.strokeStyle='#f58663';c.lineWidth=3;c.stroke();
  for(const b of g.balls){const p=g.path.at(b.s);ball(p.x,p.y,g.level.ballRadius,b.color);}
- for(const s of g.shots)ball(s.x,s.y,g.level.ballRadius,s.color);
+ if(g.effects.previewUntil>g.time){const target=previewTarget(g);c.beginPath();c.moveTo(500+Math.cos(g.angle)*55,500+Math.sin(g.angle)*55);c.lineTo(target.x,target.y);c.strokeStyle=skin.accent;c.lineWidth=3;c.setLineDash([7,10]);c.stroke();c.setLineDash([]);c.beginPath();c.arc(target.x,target.y,10,0,Math.PI*2);c.stroke();}
+ for(const s of g.shots){ball(s.x,s.y,g.level.ballRadius,s.color);if(s.power){c.beginPath();c.arc(s.x,s.y,g.level.ballRadius+5,0,Math.PI*2);c.strokeStyle=s.power==='burning'?'#ff9c40':'#70f5c6';c.lineWidth=4;c.stroke();}}
  c.save();c.translate(500,500);c.rotate(g.angle);c.shadowColor=skin.accent;c.shadowBlur=18;c.fillStyle=skin.turret;c.beginPath();c.roundRect(-8,-15,70,30,12);c.fill();c.shadowBlur=0;c.restore();
  c.beginPath();c.arc(500,500,37,0,Math.PI*2);c.fillStyle='#334952';c.fill();c.strokeStyle=skin.turret;c.lineWidth=3;c.stroke();ball(500,500,23,g.current);
+ if(g.effects.burningShots||g.effects.infectionShots){c.beginPath();c.arc(500,500,42,0,Math.PI*2);c.strokeStyle=g.effects.burningShots?'#ff9c40':'#70f5c6';c.lineWidth=4;c.stroke();}
  c.fillStyle='#8aa0a8';c.font='10px system-ui';c.fillText('PRO MAX',500,560);
- // Reserved slot module position; no spins or rewards in this demo.
- c.fillStyle='#17262d';c.beginPath();c.roundRect(455,576,90,32,9);c.fill();c.fillStyle='#526a75';c.font='10px system-ui';c.fillText('·  ·  ·',500,593);
+ if(g.slots){c.fillStyle='#17262d';c.beginPath();c.roundRect(455,576,90,32,9);c.fill();c.fillStyle=g.slots.phase==='spinning'?skin.accent:'#aab8a0';c.font='15px system-ui';reelSymbols(g.slots).forEach((symbol,i)=>c.fillText(symbol,470+i*30,593));}
  const progress=g.spawned/g.level.ballCount;c.beginPath();c.arc(500,500,465,-Math.PI/2,-Math.PI/2+Math.PI*2*progress);c.strokeStyle=skin.accent;c.lineWidth=4;c.stroke();
  for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.life-=dt;if(p.life<=0){particles.splice(i,1);continue;}p.x+=p.vx*dt;p.y+=p.vy*dt;c.globalAlpha=p.life/.6;c.fillStyle=skin.colors[p.color];c.beginPath();c.arc(p.x,p.y,4,0,Math.PI*2);c.fill();}c.globalAlpha=1;
  c.restore();}

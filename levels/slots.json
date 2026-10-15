@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "ballsPerSpin": 9,
+  "spinSeconds": 1.8,
+  "resultSeconds": 1.2,
+  "rewards": [
+    {"type":"preview","label":"AIM PREVIEW","symbol":"◎","weight":25,"amount":12},
+    {"type":"burning","label":"BURNING BALLS","symbol":"▲","weight":20,"amount":3},
+    {"type":"infection","label":"INFECTED BALLS","symbol":"✚","weight":15,"amount":3},
+    {"type":"color","label":"COLOR SHIFT","symbol":"●","weight":15,"amount":1},
+    {"type":"gold","label":"GOLD","symbol":"◆","weight":20,"amount":1},
+    {"type":"none","label":"NO REWARD","symbol":"—","weight":15}
+  ]
+}
